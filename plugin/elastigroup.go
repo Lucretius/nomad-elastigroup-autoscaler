@@ -12,15 +12,6 @@ import (
 	"github.com/spotinst/spotinst-sdk-go/spotinst"
 )
 
-type SpotinstCloudProvider int
-
-const (
-	Azure SpotinstCloudProvider = iota
-	AWS
-	GCP
-	Unknown
-)
-
 type Elastigroup struct {
 	Group       interface{}
 	Total       int64
@@ -45,11 +36,11 @@ func spotinstElastigroupNodeIDMap(n *api.Node) (string, error) {
 
 func (t *TargetPlugin) getCurrentElastigroup(ctx context.Context) (*Elastigroup, error) {
 	g := &Elastigroup{}
-	provider, ok := t.config[configKeyProvider]; 
+	provider, ok := t.config[configKeyProvider]
 	if !ok {
 		return nil, fmt.Errorf("provider is a required field")
 	}
-	groupID, ok := t.config[configKeyElastigroupID]; 
+	groupID, ok := t.config[configKeyElastigroupID]
 	if !ok {
 		return nil, fmt.Errorf("elastigroup_id is a required field")
 	}
@@ -98,11 +89,11 @@ func (t *TargetPlugin) getCurrentElastigroup(ctx context.Context) (*Elastigroup,
 // every VM in the elastigroup is in a running state
 func (t *TargetPlugin) getCurrentElastigroupTargetStatus(ctx context.Context) (*ElastigroupStatus, error) {
 	status := &ElastigroupStatus{}
-	provider, ok := t.config[configKeyProvider]; 
+	provider, ok := t.config[configKeyProvider]
 	if !ok {
 		return nil, fmt.Errorf("provider is a required field")
 	}
-	groupID, ok := t.config[configKeyElastigroupID]; 
+	groupID, ok := t.config[configKeyElastigroupID]
 	if !ok {
 		return nil, fmt.Errorf("elastigroup_id is a required field")
 	}
@@ -157,11 +148,11 @@ func (t *TargetPlugin) getCurrentElastigroupTargetStatus(ctx context.Context) (*
 
 func (t *TargetPlugin) scale(ctx context.Context, count int64, g Elastigroup) error {
 	var err error
-	provider, ok := t.config[configKeyProvider]; 
+	provider, ok := t.config[configKeyProvider]
 	if !ok {
 		return fmt.Errorf("provider is a required field")
 	}
-	
+
 	switch provider {
 	case "azure":
 		azureGroup, ok := g.Group.(*azure.Group)
@@ -204,17 +195,4 @@ func (t *TargetPlugin) calculateDirection(target, desired int64) string {
 		return "out"
 	}
 	return ""
-}
-
-func readElastigroupProvider(provider string) (SpotinstCloudProvider, error) {
-	switch provider {
-	case "Azure":
-		return Azure, nil
-	case "AWS":
-		return AWS, nil
-	case "GCP":
-		return GCP, nil
-	default:
-		return Unknown, fmt.Errorf("Unknown provider: %s", provider)
-	}
 }

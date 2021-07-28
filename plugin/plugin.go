@@ -41,8 +41,8 @@ var _ target.Target = (*TargetPlugin)(nil)
 
 // TargetPlugin is the DigitalOcean implementation of the target.Target interface.
 type TargetPlugin struct {
-	config   map[string]string
-	logger   hclog.Logger
+	config map[string]string
+	logger hclog.Logger
 
 	client *elastigroup.ServiceOp
 
